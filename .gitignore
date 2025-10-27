@@ -3,7 +3,4 @@
 /android/
 /addons/
 /demo/
-
-# Blender 4+ specific ignores
-assets/**.blend1
-assets/**.import
+**/*.gd.uid

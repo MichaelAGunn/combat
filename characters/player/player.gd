@@ -7,9 +7,11 @@ var movement_input := Vector2.ZERO
 var _mouse_input_dir := Vector2.ZERO
 var mouse_sensitivity: float = 0.15
 var _last_movement_dir := Vector3.BACK
+var attack_time: float
 
 @export var walk_speed: float = 4.0
 @export var run_speed: float = 12.0
+@export var sneak_speed: float = 2.0
 @export var jump_height: float = 1.0
 @export var jump_time_to_peak: float = 0.4
 @export var jump_time_to_descent: float = 0.3
@@ -22,13 +24,11 @@ var _last_movement_dir := Vector3.BACK
 @onready var spring_arm_3d = $CameraControl/SpringArm3D
 @onready var camera_3d = $CameraControl/SpringArm3D/Camera3D
 @onready var body = $MeshInstance3D
+@onready var anima = $AnimationPlayer
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	initialize_state_machine()
-	print("VECTOR3")
-	print(Vector3.ZERO)
-	print("VECTOR3")
 
 func _input(event: InputEvent) -> void:
 	# Essential Buttons
@@ -64,13 +64,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		player_sm.dispatch(&"to_run")
 	if player_sm.get_active_state().name == "run" and event.is_action_released("run"):
 		player_sm.dispatch(&"to_walk")
-	# Handle Attacks
+	# Attacking
 	if event.is_action_pressed("attack"):
 		player_sm.dispatch(&"to_attack")
+	# Blocking
+	if event.is_action_pressed("block"):
+		pass
 
 func _physics_process(delta: float) -> void:
 	print(player_sm.get_active_state())
-	print(velocity)
+	print(anima.get_current_animation())
 	if not is_on_floor() and velocity.y < 0.0:
 		player_sm.dispatch(&"to_fall")
 	# Camera by Mouse
@@ -87,7 +90,6 @@ func moving(delta: float) -> void:
 	movement_input = Input.get_vector("leftward", "rightward", "forward", "backward") \
 		.rotated(-camera_control.global_rotation.y)
 	var vel_2d = Vector2(velocity.x, velocity.z)
-	#var is_running: bool = Input.is_action_pressed("run") # ====== TODO: Replace with state machine logic! ======
 	var speed = run_speed if player_sm.get_active_state().name == "run" else walk_speed
 	if movement_input != Vector2.ZERO:
 		vel_2d += movement_input * speed * delta
@@ -117,14 +119,14 @@ func initialize_state_machine() -> void:
 	var jump_state = LimboState.new().named("jump").call_on_enter(walk_start).call_on_update(run_update)
 	var leap_state = LimboState.new().named("leap").call_on_enter(leap_start).call_on_update(leap_update)
 	var fall_state = LimboState.new().named("fall").call_on_enter(fall_start).call_on_update(fall_update)
-	#var attack_state = LimboState.new().named("attack").call_on_enter(attack_start).call_on_update(attack_update)
+	var attack_state = LimboState.new().named("attack").call_on_enter(attack_start).call_on_update(attack_update)
 	player_sm.add_child(idle_state)
 	player_sm.add_child(walk_state)
 	player_sm.add_child(run_state)
 	player_sm.add_child(jump_state)
 	player_sm.add_child(fall_state)
 	player_sm.add_child(leap_state)
-	#player_sm.add_child(attack_state)
+	player_sm.add_child(attack_state)
 	player_sm.initial_state = idle_state
 	player_sm.add_transition(idle_state, walk_state, &"to_walk")
 	player_sm.add_transition(idle_state, run_state, &"to_run")
@@ -134,15 +136,13 @@ func initialize_state_machine() -> void:
 	player_sm.add_transition(idle_state, jump_state, &"to_jump")
 	player_sm.add_transition(walk_state, jump_state, &"to_jump")
 	player_sm.add_transition(run_state, leap_state, &"to_leap")
-	player_sm.add_transition(jump_state, fall_state, &"to_fall")
-	player_sm.add_transition(leap_state, fall_state, &"to_fall")
-	#player_sm.add_transition(player_sm.ANYSTATE, attack_state, &"to_attack")
+	player_sm.add_transition(player_sm.ANYSTATE, fall_state, &"to_fall")
+	player_sm.add_transition(player_sm.ANYSTATE, attack_state, &"to_attack")
 	player_sm.initialize(self)
 	player_sm.set_active(true)
 
 func idle_start() -> void:
-	# This is where to call the animation!
-	pass
+	anima.play("idle")
 
 func idle_update(delta: float) -> void:
 	if is_on_floor() and (velocity.x != 0.0 or velocity.z != 0.0):
@@ -151,8 +151,7 @@ func idle_update(delta: float) -> void:
 		player_sm.dispatch(&"to_jump")
 
 func walk_start() -> void:
-	# This is where to call the animation!
-	pass
+	anima.play("walk-loop")
 
 func walk_update(delta: float) -> void:
 	if is_on_floor() and velocity.x == 0.0 and velocity.y == 0.0 and velocity.z == 0.0:
@@ -161,8 +160,7 @@ func walk_update(delta: float) -> void:
 		player_sm.dispatch(&"to_jump")
 
 func run_start() -> void:
-	# This is where to call the animation!
-	pass
+	anima.play("run-loop")
 
 func run_update(delta: float) -> void:
 	if is_on_floor() and velocity.x == 0.0 and velocity.y == 0.0 and velocity.z == 0.0:
@@ -171,32 +169,33 @@ func run_update(delta: float) -> void:
 		player_sm.dispatch(&"to_leap")
 
 func jump_start() -> void:
-	# This is where to call the animation!
-	pass
+	anima.play("jump")
 
 func jump_update(delta: float) -> void:
 	if is_on_floor():
 		player_sm.dispatch(&"state_ended")
 
 func leap_start() -> void:
-	# This is where to call the animation!
-	pass
+	anima.play("leap")
 
 func leap_update(delta: float) -> void:
 	if is_on_floor():
 		player_sm.dispatch(&"state_ended")
 
 func fall_start() -> void:
-	# This is where to call the animation!
-	pass
+	anima.play("fall")
 
 func fall_update(delta: float) -> void:
 	if is_on_floor():
 		player_sm.dispatch(&"state_ended")
 
 func attack_start() -> void:
-	# This is where to call the animation!
-	pass
+	attack_time = 5.0
+	anima.play("attack")
 
 func attack_update(delta: float) -> void:
-	pass
+	attack_time -= 0.1 # Works better than a timer!
+	if not is_on_floor(): # Float in air while attacking
+		velocity.y = 0.2
+	if attack_time <= 0.0:
+		player_sm.dispatch(&"state_ended")
