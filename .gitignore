@@ -1,6 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+/addons/
+/demo/
 
 # Blender 4+ specific ignores
 assets/**.blend1
