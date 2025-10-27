@@ -60,9 +60,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		spring_arm_3d.spring_length += 1
 		spring_arm_3d.spring_length = clamp(spring_arm_3d.spring_length, 2.0, 12.0)
 	# Walking and Running
-	if player_sm.get_active_state().name == "walk" and event.is_action_pressed("run"):
+	if (velocity.x != 0.0 or velocity.z != 0.0) and event.is_action_pressed("run"):
 		player_sm.dispatch(&"to_run")
-	if player_sm.get_active_state().name == "run" and event.is_action_released("run"):
+	if (velocity.x != 0.0 or velocity.z != 0.0) and event.is_action_released("run"):
 		player_sm.dispatch(&"to_walk")
 	# Attacking
 	if event.is_action_pressed("attack"):
@@ -116,7 +116,7 @@ func initialize_state_machine() -> void:
 	var idle_state = LimboState.new().named("idle").call_on_enter(idle_start).call_on_update(idle_update)
 	var walk_state = LimboState.new().named("walk").call_on_enter(walk_start).call_on_update(walk_update)
 	var run_state = LimboState.new().named("run").call_on_enter(run_start).call_on_update(run_update)
-	var jump_state = LimboState.new().named("jump").call_on_enter(walk_start).call_on_update(run_update)
+	var jump_state = LimboState.new().named("jump").call_on_enter(jump_start).call_on_update(jump_update)
 	var leap_state = LimboState.new().named("leap").call_on_enter(leap_start).call_on_update(leap_update)
 	var fall_state = LimboState.new().named("fall").call_on_enter(fall_start).call_on_update(fall_update)
 	var attack_state = LimboState.new().named("attack").call_on_enter(attack_start).call_on_update(attack_update)
@@ -142,11 +142,14 @@ func initialize_state_machine() -> void:
 	player_sm.set_active(true)
 
 func idle_start() -> void:
-	anima.play("idle")
+	anima.play("idle-loop")
 
 func idle_update(delta: float) -> void:
 	if is_on_floor() and (velocity.x != 0.0 or velocity.z != 0.0):
-		player_sm.dispatch(&"to_walk")
+		if Input.is_action_pressed("run"):
+			player_sm.dispatch(&"to_run")
+		else:
+			player_sm.dispatch(&"to_walk")
 	elif not is_on_floor() and velocity.y > 0.0:
 		player_sm.dispatch(&"to_jump")
 
