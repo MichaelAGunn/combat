@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://3f17c1u76xhm"]
+[gd_scene load_steps=18 format=3 uid="uid://3f17c1u76xhm"]
 
 [ext_resource type="Script" uid="uid://do01vq88w3q48" path="res://characters/player/player.gd" id="1_508ok"]
 
@@ -54,6 +54,21 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Color(0, 0.466667, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_x5dtk"]
+resource_name = "hop"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:mesh:material:albedo_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.515753, 0.994961, 0.999999, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_c6leb"]
@@ -146,11 +161,28 @@ tracks/0/keys = {
 "values": [Color(0.641934, 0.641934, 0.641934, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_3t07l"]
+resource_name = "die"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:mesh:material:albedo_color")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.458824, 0.0705882, 1, 1), Color(0, 0, 0, 1)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_x5dtk"]
 _data = {
 &"RESET": SubResource("Animation_exd8k"),
 &"attack": SubResource("Animation_rpf03"),
+&"die": SubResource("Animation_3t07l"),
 &"fall": SubResource("Animation_idpv6"),
+&"hop": SubResource("Animation_x5dtk"),
 &"hurt": SubResource("Animation_c6leb"),
 &"idle": SubResource("Animation_xxgcw"),
 &"jump": SubResource("Animation_508ok"),

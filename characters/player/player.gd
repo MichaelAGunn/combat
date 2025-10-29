@@ -116,6 +116,7 @@ func initialize_state_machine() -> void:
 	var idle_state = LimboState.new().named("idle").call_on_enter(idle_start).call_on_update(idle_update)
 	var walk_state = LimboState.new().named("walk").call_on_enter(walk_start).call_on_update(walk_update)
 	var run_state = LimboState.new().named("run").call_on_enter(run_start).call_on_update(run_update)
+	var hop_state = LimboState.new().named("hop").call_on_enter(hop_start).call_on_update(hop_update)
 	var jump_state = LimboState.new().named("jump").call_on_enter(jump_start).call_on_update(jump_update)
 	var leap_state = LimboState.new().named("leap").call_on_enter(leap_start).call_on_update(leap_update)
 	var fall_state = LimboState.new().named("fall").call_on_enter(fall_start).call_on_update(fall_update)
@@ -123,9 +124,10 @@ func initialize_state_machine() -> void:
 	player_sm.add_child(idle_state)
 	player_sm.add_child(walk_state)
 	player_sm.add_child(run_state)
+	player_sm.add_child(hop_state)
 	player_sm.add_child(jump_state)
-	player_sm.add_child(fall_state)
 	player_sm.add_child(leap_state)
+	player_sm.add_child(fall_state)
 	player_sm.add_child(attack_state)
 	player_sm.initial_state = idle_state
 	player_sm.add_transition(idle_state, walk_state, &"to_walk")
@@ -133,7 +135,7 @@ func initialize_state_machine() -> void:
 	player_sm.add_transition(player_sm.ANYSTATE, idle_state, &"state_ended")
 	player_sm.add_transition(walk_state, run_state, &"to_run")
 	player_sm.add_transition(run_state, walk_state, &"to_walk")
-	player_sm.add_transition(idle_state, jump_state, &"to_jump")
+	player_sm.add_transition(idle_state, hop_state, &"to_hop")
 	player_sm.add_transition(walk_state, jump_state, &"to_jump")
 	player_sm.add_transition(run_state, leap_state, &"to_leap")
 	player_sm.add_transition(player_sm.ANYSTATE, fall_state, &"to_fall")
@@ -151,7 +153,7 @@ func idle_update(delta: float) -> void:
 		else:
 			player_sm.dispatch(&"to_walk")
 	elif not is_on_floor() and velocity.y > 0.0:
-		player_sm.dispatch(&"to_jump")
+		player_sm.dispatch(&"to_hop")
 
 func walk_start() -> void:
 	anima.play("walk-loop")
@@ -170,6 +172,13 @@ func run_update(delta: float) -> void:
 		player_sm.dispatch(&"state_ended")
 	elif not is_on_floor() and velocity.y > 0.0:
 		player_sm.dispatch(&"to_leap")
+
+func hop_start() -> void:
+	anima.play("hop")
+
+func hop_update(delta: float) -> void:
+	if is_on_floor():
+		player_sm.dispatch(&"state_ended")
 
 func jump_start() -> void:
 	anima.play("jump")
