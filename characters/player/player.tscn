@@ -1,6 +1,6 @@
 [gd_scene load_steps=16 format=3 uid="uid://3f17c1u76xhm"]
 
-[ext_resource type="Script" uid="uid://c77xpkjxaca0v" path="res://characters/player/player.gd" id="1_508ok"]
+[ext_resource type="Script" uid="uid://do01vq88w3q48" path="res://characters/player/player.gd" id="1_508ok"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_508ok"]
 
@@ -54,6 +54,36 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Color(0, 0.466667, 0, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_c6leb"]
+resource_name = "hurt"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:mesh:material:albedo_color")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(0.458824, 0.0705882, 1, 1), Color(1, 1, 1, 1), Color(0.458824, 0.0705882, 1, 1), Color(1, 1, 1, 1), Color(0.458824, 0.0705882, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_xxgcw"]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:mesh:material:albedo_color")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
 }
 
 [sub_resource type="Animation" id="Animation_508ok"]
@@ -114,36 +144,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Color(0.641934, 0.641934, 0.641934, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_xxgcw"]
-resource_name = "idle"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("MeshInstance3D:mesh:material:albedo_color")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
-
-[sub_resource type="Animation" id="Animation_c6leb"]
-resource_name = "hurt"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("MeshInstance3D:mesh:material:albedo_color")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
-"update": 0,
-"values": [Color(0.458824, 0.0705882, 1, 1), Color(1, 1, 1, 1), Color(0.458824, 0.0705882, 1, 1), Color(1, 1, 1, 1), Color(0.458824, 0.0705882, 1, 1)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_x5dtk"]

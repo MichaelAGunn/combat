@@ -142,7 +142,7 @@ func initialize_state_machine() -> void:
 	player_sm.set_active(true)
 
 func idle_start() -> void:
-	anima.play("idle-loop")
+	anima.play("idle")
 
 func idle_update(delta: float) -> void:
 	if is_on_floor() and (velocity.x != 0.0 or velocity.z != 0.0):
